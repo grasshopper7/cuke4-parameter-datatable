@@ -11,13 +11,23 @@ import java.util.stream.Collectors;
 import cucumber.api.TypeRegistry;
 import cucumber.api.TypeRegistryConfigurer;
 import dataobject.FullName;
+import dataobject.Lecture;
+import dataobject.LectureLite;
+import dataobject.Lectures;
 import dataobject.Money;
+import dataobject.ProfLevels;
+import dataobject.Professor;
 import dataobject.ProfessorNoArg;
 import dataobject.User;
 import io.cucumber.cucumberexpressions.ParameterByTypeTransformer;
 import io.cucumber.cucumberexpressions.ParameterType;
+import io.cucumber.datatable.DataTable;
+import io.cucumber.datatable.DataTableType;
 import io.cucumber.datatable.TableCellByTypeTransformer;
+import io.cucumber.datatable.TableCellTransformer;
 import io.cucumber.datatable.TableEntryByTypeTransformer;
+import io.cucumber.datatable.TableRowTransformer;
+import io.cucumber.datatable.TableTransformer;
 import io.cucumber.datatable.dependency.com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Configurer implements TypeRegistryConfigurer {
@@ -27,7 +37,7 @@ public class Configurer implements TypeRegistryConfigurer {
 		
 		JacksonTableTransformer jacksonTableTransformer = new JacksonTableTransformer();
 		registry.setDefaultParameterTransformer(jacksonTableTransformer);
-        //registry.setDefaultDataTableEntryTransformer(jacksonTableTransformer);
+        registry.setDefaultDataTableEntryTransformer(jacksonTableTransformer);
         registry.setDefaultDataTableCellTransformer(jacksonTableTransformer);
 
 		registry.defineParameterType(
@@ -47,6 +57,37 @@ public class Configurer implements TypeRegistryConfigurer {
 
 		registry.defineParameterType(
 				new ParameterType<>("professor", ".*?", ProfessorNoArg.class, ProfessorNoArg::parseProfessor));
+		
+		
+		
+		registry.defineDataTableType(new DataTableType(Professor.class, new TableCellTransformer<Professor>() {
+			@Override
+			public Professor transform(String cell) throws Throwable {
+				return new Professor(cell);
+			}
+		}));
+		
+		registry.defineDataTableType(new DataTableType(ProfLevels.class, new TableCellTransformer<ProfLevels>() {
+			@Override
+			public ProfLevels transform(String cell) throws Throwable {
+				return ProfLevels.valueOf(cell.toUpperCase());
+			}
+		}));
+		
+		registry.defineDataTableType(new DataTableType(LectureLite.class, new TableRowTransformer<LectureLite>() {
+			@Override
+			public LectureLite transform(List<String> row) throws Throwable {
+				return LectureLite.createLectureLite(row);
+			}
+		}));
+		
+		registry.defineDataTableType(new DataTableType(Lectures.class, new TableTransformer<Lectures>() {
+			@Override
+			public Lectures transform(DataTable table) throws Throwable {
+				List<Lecture> lects = table.asMaps().stream().map(m -> Lecture.createLecture(m)).collect(Collectors.toList());
+				return new Lectures(lects);
+			}
+		}));
 
 	}
 
@@ -55,7 +96,8 @@ public class Configurer implements TypeRegistryConfigurer {
 		return Locale.ENGLISH;
 	}
 
-	private static final class JacksonTableTransformer implements ParameterByTypeTransformer, TableEntryByTypeTransformer, TableCellByTypeTransformer {
+	private static final class JacksonTableTransformer implements ParameterByTypeTransformer, 
+		TableEntryByTypeTransformer, TableCellByTypeTransformer {
 
 		private final ObjectMapper objectMapper = new ObjectMapper();
 

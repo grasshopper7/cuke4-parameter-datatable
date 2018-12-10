@@ -1,8 +1,8 @@
 Feature: Parameter Conversion for Cucumber-JVM 4
 
-  Scenario: Delimiter Annotation scenario
-    Given the user names are jane,john,colin,alice
-    Given the users are jane,john,colin,alice
+  #Scenario: Delimiter Annotation scenario
+   # Given the user names are jane,john,colin,alice
+   # Given the users are jane,john,colin,alice
 
   Scenario: Format Annotation scenario
     Given the date is 2017-11-05T09:54:13
