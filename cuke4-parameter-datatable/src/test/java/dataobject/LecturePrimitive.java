@@ -1,7 +1,5 @@
 package dataobject;
 
-import java.util.Map;
-
 public class LecturePrimitive {
 
 	private String profName;
@@ -29,13 +27,6 @@ public class LecturePrimitive {
 		this.profLevel = profLevel;
 	}
 
-	public static LecturePrimitive createLecture(Map<String, String> entry) {
-		LecturePrimitive lecture = new LecturePrimitive();
-		lecture.setProfName(entry.get("profName"));
-		lecture.setSize(Integer.parseInt(entry.get("size")));
-		lecture.setProfLevel(entry.get("profLevel"));
-		return lecture;
-	}
 	@Override
 	public String toString() {
 		return "LecturePrimitive [profName=" + profName + ", size=" + size + ", profLevel=" + profLevel + "]";
