@@ -1,3 +1,3 @@
-Refer to this for more details - http://grasshopper.tech/340/
+Refer to this for more details - https://grasshopper.tech/340/
 
 XStream was removed from Cucumber-JVM in version 3 for various reasons. Though it reduced a lot of complexities, it removed functionality which automatically transformed a DataTable into a collection of objects or String to a object. This now requires code for each transformation to define a DataTableType or ParamterType in the TypeRegistry for these cases. This has been made easier in Cucumber-JVM 4.0.0 by using Jackson ObjectMapper for DataTables and Anonymous Parameter Types for Parameters in version 4.2.0. Refer to official announcements for version 4.0.0 and version 4.2.0.
