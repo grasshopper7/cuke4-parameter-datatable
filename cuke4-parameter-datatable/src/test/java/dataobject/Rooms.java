@@ -10,7 +10,7 @@ public class Rooms {
 	private List<Room> rooms;
 	
 	public Rooms(String details) {
-		parseRooms(details);
+		this.setRooms(Arrays.stream(details.split(",")).map(Room::new).collect(Collectors.toList()));
 	}
 
 	public Rooms(List<Room> rooms) {
