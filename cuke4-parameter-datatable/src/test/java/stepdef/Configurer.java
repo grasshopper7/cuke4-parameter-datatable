@@ -34,11 +34,11 @@ public class Configurer implements TypeRegistryConfigurer {
 
 	@Override
 	public void configureTypeRegistry(TypeRegistry registry) {
-		
+
 		JacksonTableTransformer jacksonTableTransformer = new JacksonTableTransformer();
 		registry.setDefaultParameterTransformer(jacksonTableTransformer);
-        registry.setDefaultDataTableEntryTransformer(jacksonTableTransformer);
-        registry.setDefaultDataTableCellTransformer(jacksonTableTransformer);
+		registry.setDefaultDataTableEntryTransformer(jacksonTableTransformer);
+		registry.setDefaultDataTableCellTransformer(jacksonTableTransformer);
 
 		registry.defineParameterType(
 				new ParameterType<>("names", ".*?", List.class, (String s) -> Arrays.asList(s.split(","))));
@@ -57,34 +57,36 @@ public class Configurer implements TypeRegistryConfigurer {
 
 		registry.defineParameterType(
 				new ParameterType<>("professor", ".*?", ProfessorNoArg.class, ProfessorNoArg::parseProfessor));
-		
-		
-		
+
+		registry.defineParameterType(new ParameterType<>("currency", "(.) main currency ([\\d]+) fractional currency ([\\d]+)",
+				Money.class, (String[] args) -> new Money(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]))));
+
 		registry.defineDataTableType(new DataTableType(Professor.class, new TableCellTransformer<Professor>() {
 			@Override
 			public Professor transform(String cell) throws Throwable {
 				return new Professor(cell);
 			}
 		}));
-		
+
 		registry.defineDataTableType(new DataTableType(ProfLevels.class, new TableCellTransformer<ProfLevels>() {
 			@Override
 			public ProfLevels transform(String cell) throws Throwable {
 				return ProfLevels.valueOf(cell.toUpperCase());
 			}
 		}));
-		
+
 		registry.defineDataTableType(new DataTableType(LectureLite.class, new TableRowTransformer<LectureLite>() {
 			@Override
 			public LectureLite transform(List<String> row) throws Throwable {
 				return LectureLite.createLectureLite(row);
 			}
 		}));
-		
+
 		registry.defineDataTableType(new DataTableType(Lectures.class, new TableTransformer<Lectures>() {
 			@Override
 			public Lectures transform(DataTable table) throws Throwable {
-				List<Lecture> lects = table.asMaps().stream().map(m -> Lecture.createLecture(m)).collect(Collectors.toList());
+				List<Lecture> lects = table.asMaps().stream().map(m -> Lecture.createLecture(m))
+						.collect(Collectors.toList());
 				return new Lectures(lects);
 			}
 		}));
@@ -96,8 +98,8 @@ public class Configurer implements TypeRegistryConfigurer {
 		return Locale.ENGLISH;
 	}
 
-	private static final class JacksonTableTransformer implements ParameterByTypeTransformer, 
-		TableEntryByTypeTransformer, TableCellByTypeTransformer {
+	private static final class JacksonTableTransformer
+			implements ParameterByTypeTransformer, TableEntryByTypeTransformer, TableCellByTypeTransformer {
 
 		private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -105,15 +107,15 @@ public class Configurer implements TypeRegistryConfigurer {
 		public Object transform(String s, Type type) {
 			return objectMapper.convertValue(s, objectMapper.constructType(type));
 		}
-		
-        @Override
-        public <T> T transform(Map<String, String> entry, Class<T> type, TableCellByTypeTransformer cellTransformer) {
-            return objectMapper.convertValue(entry, type);
-        }
 
-        @Override
-        public <T> T transform(String value, Class<T> cellType) {
-            return objectMapper.convertValue(value, cellType);
-        }
+		@Override
+		public <T> T transform(Map<String, String> entry, Class<T> type, TableCellByTypeTransformer cellTransformer) {
+			return objectMapper.convertValue(entry, type);
+		}
+
+		@Override
+		public <T> T transform(String value, Class<T> cellType) {
+			return objectMapper.convertValue(value, cellType);
+		}
 	}
 }

@@ -79,6 +79,11 @@ public class ParameterTypeStepDefinition {
 	public void theBigDecimalValueIs(BigDecimal bigdec) {
 		System.out.println(bigdec);
 		System.out.println("");
-
+	}
+	
+	@Given("the total payment is in {currency}")
+	public void the_total_payment_is_in(Money money) {  
+		System.out.println(money);
+		System.out.println("");
 	}
 }
