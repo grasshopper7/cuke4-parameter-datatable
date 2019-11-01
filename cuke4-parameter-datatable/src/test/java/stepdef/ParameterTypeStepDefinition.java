@@ -22,7 +22,7 @@ public class ParameterTypeStepDefinition {
 	}
 
 	@Given("the users are {users}")
-	public void givenProf(List<User> names) {
+	public void givenUsers(List<User> names) {
 		System.out.println(names);
 		System.out.println("");
 	}

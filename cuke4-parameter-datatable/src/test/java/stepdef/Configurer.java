@@ -12,6 +12,7 @@ import cucumber.api.TypeRegistry;
 import cucumber.api.TypeRegistryConfigurer;
 import dataobject.FullName;
 import dataobject.Lecture;
+import dataobject.LectureId;
 import dataobject.LectureLite;
 import dataobject.Lectures;
 import dataobject.Money;
@@ -26,6 +27,7 @@ import io.cucumber.datatable.DataTableType;
 import io.cucumber.datatable.TableCellByTypeTransformer;
 import io.cucumber.datatable.TableCellTransformer;
 import io.cucumber.datatable.TableEntryByTypeTransformer;
+import io.cucumber.datatable.TableEntryTransformer;
 import io.cucumber.datatable.TableRowTransformer;
 import io.cucumber.datatable.TableTransformer;
 import io.cucumber.datatable.dependency.com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,33 +60,51 @@ public class Configurer implements TypeRegistryConfigurer {
 		registry.defineParameterType(
 				new ParameterType<>("professor", ".*?", ProfessorNoArg.class, ProfessorNoArg::parseProfessor));
 
-		registry.defineParameterType(new ParameterType<>("currency", "(.) main currency ([\\d]+) fractional currency ([\\d]+)",
-				Money.class, (String[] args) -> new Money(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]))));
+		registry.defineParameterType(
+				new ParameterType<>("currency", "(.) main currency ([\\d]+) fractional currency ([\\d]+)", Money.class,
+						(String[] args) -> new Money(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]))));
+
+		
+		//TO SHOW USE OF EXPLICIT TableEntryTransformer
+		/*registry.defineDataTableType(new DataTableType(Lecture.class, new TableEntryTransformer<Lecture>() {
+			@Override
+			public Lecture transform(Map<String, String> entry) {
+				return Lecture.createLecture(entry);
+			}
+		}));*/
+
+		//TO SHOW USE OF EXPLICIT TableCellTransformer
+		/*registry.defineDataTableType(new DataTableType(LectureId.class, new TableCellTransformer<LectureId>() {
+			@Override
+			public LectureId transform(String cell) {
+				return new LectureId(Integer.parseInt(cell));
+			}
+		}));*/
 
 		registry.defineDataTableType(new DataTableType(Professor.class, new TableCellTransformer<Professor>() {
 			@Override
-			public Professor transform(String cell) throws Throwable {
+			public Professor transform(String cell) {
 				return new Professor(cell);
 			}
 		}));
 
 		registry.defineDataTableType(new DataTableType(ProfLevels.class, new TableCellTransformer<ProfLevels>() {
 			@Override
-			public ProfLevels transform(String cell) throws Throwable {
+			public ProfLevels transform(String cell) {
 				return ProfLevels.valueOf(cell.toUpperCase());
 			}
 		}));
 
 		registry.defineDataTableType(new DataTableType(LectureLite.class, new TableRowTransformer<LectureLite>() {
 			@Override
-			public LectureLite transform(List<String> row) throws Throwable {
+			public LectureLite transform(List<String> row) {
 				return LectureLite.createLectureLite(row);
 			}
 		}));
 
 		registry.defineDataTableType(new DataTableType(Lectures.class, new TableTransformer<Lectures>() {
 			@Override
-			public Lectures transform(DataTable table) throws Throwable {
+			public Lectures transform(DataTable table) {
 				List<Lecture> lects = table.asMaps().stream().map(m -> Lecture.createLecture(m))
 						.collect(Collectors.toList());
 				return new Lectures(lects);
